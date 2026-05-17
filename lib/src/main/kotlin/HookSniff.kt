@@ -11,6 +11,14 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
     val message: Message
     val messageAttempt: MessageAttempt
     val statistics: Statistics
+    val environment: Environment
+    val backgroundTask: BackgroundTask
+    val operationalWebhook: OperationalWebhook
+    val messagePoller: MessagePoller
+    val inbound: Inbound
+    val connector: Connector
+    val integration: Integration
+    val stream: Stream
 
     init {
         if (options.baseUrl == null) {
@@ -27,5 +35,13 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         message = Message(httpClient)
         messageAttempt = MessageAttempt(httpClient)
         statistics = Statistics(httpClient)
+        environment = Environment(httpClient)
+        backgroundTask = BackgroundTask(httpClient)
+        operationalWebhook = OperationalWebhook(httpClient)
+        messagePoller = MessagePoller(httpClient)
+        inbound = Inbound(httpClient)
+        connector = Connector(httpClient)
+        integration = Integration(httpClient)
+        stream = Stream(httpClient)
     }
 }
