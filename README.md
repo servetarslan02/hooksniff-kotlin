@@ -1,102 +1,45 @@
 # HookSniff Kotlin SDK
 
-Official Kotlin client for the [HookSniff](https://hooksniff.vercel.app) webhook delivery service.
+<p align="center">
+  <a href="https://github.com/servetarslan02/HookSniff"><img src="https://img.shields.io/github/license/servetarslan02/HookSniff" alt="License"></a>
+</p>
+
+Kotlin SDK for the [HookSniff](https://hooksniff.com) webhook delivery platform.
 
 ## Installation
 
-### Gradle (Kotlin DSL)
+```bash
+implementation("com.hooksniff:hooksniff:1.0.0")
+```
+
+## Quick Start
 
 ```kotlin
-dependencies {
-    implementation("com.hooksniff:hooksniff:0.2.0")
-}
-```
-
-### Gradle (Groovy)
-
-```groovy
-dependencies {
-    implementation 'com.hooksniff:hooksniff:0.2.0'
-}
-```
-
-### Maven
-
-```xml
-<dependency>
-    <groupId>com.hooksniff</groupId>
-    <artifactId>hooksniff</artifactId>
-    <version>0.2.0</version>
-</dependency>
-```
-
-## Usage
-
-```kotlin
-import com.hooksniff.*
-
-fun main() {
-    val client = HookSniffClient("hr_live_...")
-
-    // Create endpoint
-    val endpoint = client.endpoints().create(
-        url = "https://myapp.com/webhook",
-        description = "Orders"
-    )
-
-    // Send webhook
-    val delivery = client.webhooks().send(
-        endpointId = endpoint.id,
-        event = "order.created",
-        data = mapOf("order_id" to "12345", "amount" to 99.99)
-    )
-
-    // List deliveries
-    val result = client.webhooks().list(status = "delivered", page = 1)
-    println("Total: ${result.total}")
-
-    client.close()
-}
+val client = HookSniff("hs_xxx")
+val endpoints = client.endpoint.list()
+println(endpoints)
 ```
 
 ## Webhook Verification
 
-Verify incoming webhooks using Standard Webhooks headers:
-
 ```kotlin
-val verifier = WebhookVerifier("whsec_...")
-
-// From headers map
-val result = verifier.verifyFromHeaders(
-    body = requestBody,
-    headers = mapOf(
-        "webhook-id" to request.headers["webhook-id"],
-        "webhook-timestamp" to request.headers["webhook-timestamp"],
-        "webhook-signature" to request.headers["webhook-signature"]
-    )
-)
-
-if (result.valid) {
-    println("Payload: ${result.payload}")
-} else {
-    println("Error: ${result.error}")
-}
+val wh = Webhook("whsec_xxx")
+val payload = wh.verify(body, headers)
 ```
 
-## Error Handling
+## Resources
 
-```kotlin
-try {
-    val endpoint = client.endpoints().create(url = "https://myapp.com/webhook")
-} catch (e: ValidationException) {
-    println("Validation error: ${e.message}")
-} catch (e: AuthenticationException) {
-    println("Auth error: ${e.message}")
-} catch (e: RateLimitException) {
-    println("Rate limited: ${e.message}")
-}
-```
+| Resource | Methods |
+|----------|---------|
+| Endpoint | list, create, get, update, delete |
+| Message | create, list, get |
+| MessageAttempt | list, listByMsg, get, resend |
+| Authentication | dashboardAccess |
+| EventType | list |
+| Statistics | aggregate |
 
-## License
+## Links
 
-MIT
+- [Documentation](https://docs.hooksniff.com)
+- [API Reference](https://api.hooksniff.com)
+- [GitHub](https://github.com/servetarslan02/HookSniff)
