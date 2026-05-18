@@ -100,4 +100,49 @@ class TypedWebhookEventTest {
         assertTrue(WebhookEvent.EVENT_TYPE_MAP.containsKey("endpoint.created"))
         assertTrue(WebhookEvent.EVENT_TYPE_MAP.containsKey("message.attempt.exhausted"))
     }
+
+    @Test
+    fun testEndpointUpdatedData() {
+        val event = WebhookEvent(event = "endpoint.updated", data = mapOf("appId" to "a1", "endpointId" to "e1"), timestamp = "")
+        assertEquals("a1", event.toEndpointUpdatedData().appId)
+    }
+
+    @Test
+    fun testEndpointDeletedData() {
+        val event = WebhookEvent(event = "endpoint.deleted", data = mapOf("appId" to "a1", "endpointId" to "e1"), timestamp = "")
+        assertEquals("e1", event.toEndpointDeletedData().endpointId)
+    }
+
+    @Test
+    fun testEndpointEnabledData() {
+        val event = WebhookEvent(event = "endpoint.enabled", data = mapOf("appId" to "a1", "endpointId" to "e1"), timestamp = "")
+        assertEquals("a1", event.toEndpointEnabledData().appId)
+    }
+
+    @Test
+    fun testEmptyData() {
+        val event = WebhookEvent(event = "endpoint.created", data = emptyMap(), timestamp = "")
+        assertEquals("", event.toEndpointCreatedData().appId)
+    }
+
+    @Test
+    fun testGetMissingKey() {
+        val event = WebhookEvent(event = "test", data = mapOf("x" to 1), timestamp = "")
+        assertNull(event["missing"])
+    }
+
+    @Test
+    fun testAllEndpointEventTypes() {
+        for (type in listOf("endpoint.created", "endpoint.updated", "endpoint.deleted", "endpoint.enabled", "endpoint.disabled")) {
+            assertEquals(type, WebhookEvent(event = type, data = emptyMap(), timestamp = "").event)
+        }
+    }
+
+    @Test
+    fun testUnicodeData() {
+        val event = WebhookEvent(event = "endpoint.created", data = mapOf("appId" to "ünïcödé", "endpointId" to "日本語"), timestamp = "")
+        val data = event.toEndpointCreatedData()
+        assertEquals("ünïcödé", data.appId)
+        assertEquals("日本語", data.endpointId)
+    }
 }
