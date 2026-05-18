@@ -2,7 +2,6 @@ package com.hooksniff.kotlin
 
 import com.hooksniff.kotlin.exceptions.WebhookSigningException
 import com.hooksniff.kotlin.exceptions.WebhookVerificationException
-import java.net.http.HttpHeaders
 import java.nio.charset.StandardCharsets
 import java.security.InvalidKeyException
 import java.security.MessageDigest
@@ -14,13 +13,15 @@ import javax.crypto.spec.SecretKeySpec
 class Webhook {
     private val key: ByteArray
 
+    /**
+     * Verify a webhook signature using java.net.http.HttpHeaders.
+     */
     @Throws(WebhookVerificationException::class)
-    fun verify(payload: String?, headers: HttpHeaders) {
+    fun verify(payload: String?, headers: java.net.http.HttpHeaders) {
         var msgId = headers.firstValue(HOOKSNIFF_MSG_ID_KEY)
         var msgSignature = headers.firstValue(HOOKSNIFF_MSG_SIGNATURE_KEY)
         var msgTimestamp = headers.firstValue(HOOKSNIFF_MSG_TIMESTAMP_KEY)
         if (msgId.isEmpty || msgSignature.isEmpty || msgTimestamp.isEmpty) {
-            // fallback to unbranded
             msgId = headers.firstValue(UNBRANDED_MSG_ID_KEY)
             msgSignature = headers.firstValue(UNBRANDED_MSG_SIGNATURE_KEY)
             msgTimestamp = headers.firstValue(UNBRANDED_MSG_TIMESTAMP_KEY)
@@ -28,14 +29,37 @@ class Webhook {
                 throw WebhookVerificationException("Missing required headers")
             }
         }
-        val timestamp: Long = verifyTimestamp(msgTimestamp.get())
+        verifyInternal(msgId.get(), msgSignature.get(), msgTimestamp.get(), payload)
+    }
+
+    /**
+     * Verify a webhook signature using a Map<String, String>.
+     */
+    @Throws(WebhookVerificationException::class)
+    fun verify(payload: String?, headers: Map<String, String>) {
+        var msgId = headers[HOOKSNIFF_MSG_ID_KEY]
+        var msgSignature = headers[HOOKSNIFF_MSG_SIGNATURE_KEY]
+        var msgTimestamp = headers[HOOKSNIFF_MSG_TIMESTAMP_KEY]
+        if (msgId == null || msgSignature == null || msgTimestamp == null) {
+            msgId = headers[UNBRANDED_MSG_ID_KEY]
+            msgSignature = headers[UNBRANDED_MSG_SIGNATURE_KEY]
+            msgTimestamp = headers[UNBRANDED_MSG_TIMESTAMP_KEY]
+            if (msgId == null || msgSignature == null || msgTimestamp == null) {
+                throw WebhookVerificationException("Missing required headers")
+            }
+        }
+        verifyInternal(msgId, msgSignature, msgTimestamp, payload)
+    }
+
+    private fun verifyInternal(msgId: String, msgSignature: String, msgTimestamp: String, payload: String?) {
+        val timestamp = verifyTimestamp(msgTimestamp)
         val expectedSignature: String =
             try {
-                sign(msgId.get(), timestamp, payload).split(",".toRegex()).toTypedArray()[1]
+                sign(msgId, timestamp, payload).split(",".toRegex()).toTypedArray()[1]
             } catch (e: WebhookSigningException) {
                 throw WebhookVerificationException("Failed to generate expected signature")
             }
-        val msgSignatures = msgSignature.get().split(" ".toRegex()).toTypedArray()
+        val msgSignatures = msgSignature.split(" ".toRegex()).toTypedArray()
         for (versionedSignature in msgSignatures) {
             val sigParts = versionedSignature.split(",".toRegex()).toTypedArray()
             if (sigParts.size < 2) {

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Implementation-Title: hooksniff-kotlin
+Implementation-Version: 1.2.0
+Implementation-Vendor: HookSniff (https://hooksniff.vercel.app)
+Bundle-SymbolicName: hooksniff-sdk-kotlin
+Export-Package: com.hooksniff.kotlin
+

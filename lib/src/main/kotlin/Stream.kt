@@ -1,30 +1,66 @@
-package com.hooksniff
+package com.hooksniff.kotlin
+
+import com.hooksniff.kotlin.models.PublishEventIn
+import com.hooksniff.kotlin.models.PublishEventResponse
+import com.hooksniff.kotlin.models.StreamChannelDetailOut
+import com.hooksniff.kotlin.models.StreamChannelIn
+import com.hooksniff.kotlin.models.StreamChannelOut
+import com.hooksniff.kotlin.models.StreamChannelUpdate
+import com.hooksniff.kotlin.models.StreamMessageOut
+import com.hooksniff.kotlin.models.StreamSubscriptionOut
 
 class Stream(private val client: HookSniffHttpClient) {
-    fun listChannels(): List<Map<String, Any?>> =
-        client.request("GET", "/api/v1/stream/channels")
+    /** List all stream channels. */
+    suspend fun listChannels(): List<StreamChannelOut> {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/channels")
+        return client.executeRequest<Any, List<StreamChannelOut>>("GET", url.build())
+    }
 
-    fun getChannel(id: String): Map<String, Any?> =
-        client.request("GET", "/api/v1/stream/channels/$id")
+    /** Get a stream channel by ID. */
+    suspend fun getChannel(id: String): StreamChannelDetailOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/channels/$id")
+        return client.executeRequest<Any, StreamChannelDetailOut>("GET", url.build())
+    }
 
-    fun createChannel(body: Map<String, Any?>): Map<String, Any?> =
-        client.request("POST", "/api/v1/stream/channels", body)
+    /** Create a new stream channel. */
+    suspend fun createChannel(channelIn: StreamChannelIn): StreamChannelOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/channels")
+        return client.executeRequest<StreamChannelIn, StreamChannelOut>("POST", url.build(), reqBody = channelIn)
+    }
 
-    fun updateChannel(id: String, body: Map<String, Any?>): Map<String, Any?> =
-        client.request("PUT", "/api/v1/stream/channels/$id", body)
+    /** Update a stream channel. */
+    suspend fun updateChannel(id: String, channelUpdate: StreamChannelUpdate): StreamChannelOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/channels/$id")
+        return client.executeRequest<StreamChannelUpdate, StreamChannelOut>("PUT", url.build(), reqBody = channelUpdate)
+    }
 
-    fun deleteChannel(id: String) =
-        client.request<Void>("DELETE", "/api/v1/stream/channels/$id")
+    /** Delete a stream channel. */
+    suspend fun deleteChannel(id: String) {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/channels/$id")
+        client.executeRequest<Any, Boolean>("DELETE", url.build())
+    }
 
-    fun listMessages(id: String, params: Map<String, String> = emptyMap()): List<Map<String, Any?>> =
-        client.request("GET", "/api/v1/stream/channels/$id/messages", queryParams = params)
+    /** List messages for a stream channel. */
+    suspend fun listMessages(channelId: String): List<StreamMessageOut> {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/channels/$channelId/messages")
+        return client.executeRequest<Any, List<StreamMessageOut>>("GET", url.build())
+    }
 
-    fun listSubscriptions(): List<Map<String, Any?>> =
-        client.request("GET", "/api/v1/stream/subscriptions")
+    /** List all stream subscriptions. */
+    suspend fun listSubscriptions(): List<StreamSubscriptionOut> {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/subscriptions")
+        return client.executeRequest<Any, List<StreamSubscriptionOut>>("GET", url.build())
+    }
 
-    fun disconnectSubscription(id: String) =
-        client.request<Void>("DELETE", "/api/v1/stream/subscriptions/$id")
+    /** Disconnect a stream subscription. */
+    suspend fun disconnectSubscription(id: String) {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/subscriptions/$id")
+        client.executeRequest<Any, Boolean>("DELETE", url.build())
+    }
 
-    fun publish(body: Map<String, Any?>): Map<String, Any?> =
-        client.request("POST", "/api/v1/stream/publish", body)
+    /** Publish an event to a stream channel. */
+    suspend fun publishEvent(publishEventIn: PublishEventIn): StreamMessageOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/stream/events")
+        return client.executeRequest<PublishEventIn, StreamMessageOut>("POST", url.build(), reqBody = publishEventIn)
+    }
 }

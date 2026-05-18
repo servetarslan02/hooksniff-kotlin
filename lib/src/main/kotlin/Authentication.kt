@@ -24,6 +24,8 @@ data class AuthenticationStreamExpireAllOptions(val idempotencyKey: String? = nu
 
 data class AuthenticationRotateStreamPollerTokenOptions(val idempotencyKey: String? = null)
 
+data class AuthenticationDashboardAccessOptions(val idempotencyKey: String? = null)
+
 class Authentication(private val client: HookSniffHttpClient) {
     /**
      * Use this function to get magic links (and authentication codes) for connecting your users to
@@ -34,7 +36,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         appPortalAccessIn: AppPortalAccessIn,
         options: AuthenticationAppPortalAccessOptions = AuthenticationAppPortalAccessOptions(),
     ): AppPortalAccessOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/app-portal-access/$appId")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/app-portal-access/$appId")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -52,7 +54,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         applicationTokenExpireIn: ApplicationTokenExpireIn,
         options: AuthenticationExpireAllOptions = AuthenticationExpireAllOptions(),
     ) {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/app/$appId/expire-all")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/app/$appId/expire-all")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -70,7 +72,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         appId: String,
         options: AuthenticationDashboardAccessOptions = AuthenticationDashboardAccessOptions(),
     ): com.hooksniff.kotlin.models.DashboardAccessOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/dashboard-access/$appId")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/dashboard-access/$appId")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
         return client.executeRequest<Any, com.hooksniff.kotlin.models.DashboardAccessOut>(
@@ -86,7 +88,7 @@ class Authentication(private val client: HookSniffHttpClient) {
      * Trying to log out other tokens will fail.
      */
     suspend fun logout(options: AuthenticationLogoutOptions = AuthenticationLogoutOptions()) {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/logout")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/logout")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
         client.executeRequest<Any, Boolean>("POST", url.build(), headers = headers.build())
@@ -100,7 +102,7 @@ class Authentication(private val client: HookSniffHttpClient) {
     suspend fun streamLogout(
         options: AuthenticationStreamLogoutOptions = AuthenticationStreamLogoutOptions()
     ) {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/stream-logout")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/stream-logout")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
         client.executeRequest<Any, Boolean>("POST", url.build(), headers = headers.build())
@@ -115,7 +117,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         streamPortalAccessIn: StreamPortalAccessIn,
         options: AuthenticationStreamPortalAccessOptions = AuthenticationStreamPortalAccessOptions(),
     ): AppPortalAccessOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/stream-portal-access/$streamId")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/stream-portal-access/$streamId")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -133,7 +135,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         streamTokenExpireIn: StreamTokenExpireIn,
         options: AuthenticationStreamExpireAllOptions = AuthenticationStreamExpireAllOptions(),
     ) {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/auth/stream/$streamId/expire-all")
+        val url = client.newUrlBuilder().encodedPath("/v1/auth/stream/$streamId/expire-all")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -150,7 +152,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/api/v1/auth/stream/$streamId/sink/$sinkId/poller/token")
+                .encodedPath("/v1/auth/stream/$streamId/sink/$sinkId/poller/token")
         return client.executeRequest<Any, ApiTokenOut>("GET", url.build())
     }
 
@@ -165,7 +167,7 @@ class Authentication(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/api/v1/auth/stream/$streamId/sink/$sinkId/poller/token/rotate")
+                .encodedPath("/v1/auth/stream/$streamId/sink/$sinkId/poller/token/rotate")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 

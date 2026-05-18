@@ -38,7 +38,7 @@ class Statistics(private val client: HookSniffHttpClient) {
         appUsageStatsIn: AppUsageStatsIn,
         options: StatisticsAggregateAppStatsOptions = StatisticsAggregateAppStatsOptions(),
     ): AppUsageStatsOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/stats/usage/app")
+        val url = client.newUrlBuilder().encodedPath("/v1/stats/usage/app")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -76,7 +76,7 @@ class Statistics(private val client: HookSniffHttpClient) {
      * ```
      */
     suspend fun aggregateEventTypes(): AggregateEventTypesOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/stats/usage/event-types")
+        val url = client.newUrlBuilder().encodedPath("/v1/stats/usage/event-types")
         return client.executeRequest<Any, AggregateEventTypesOut>("PUT", url.build())
     }
 }

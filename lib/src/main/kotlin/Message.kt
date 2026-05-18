@@ -68,7 +68,7 @@ class Message(private val client: HookSniffHttpClient) {
         appId: String,
         options: MessageListOptions = MessageListOptions(),
     ): ListResponseMessageOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg")
+        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/msg")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         options.channel?.let { url.addQueryParameter("channel", it) }
@@ -102,7 +102,7 @@ class Message(private val client: HookSniffHttpClient) {
         messageIn: MessageIn,
         options: MessageCreateOptions = MessageCreateOptions(),
     ): MessageOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg")
+        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/msg")
         options.withContent?.let { url.addQueryParameter("with_content", serializeQueryParam(it)) }
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
@@ -160,7 +160,7 @@ class Message(private val client: HookSniffHttpClient) {
         appId: String,
         options: MessageExpungeAllContentsOptions = MessageExpungeAllContentsOptions(),
     ): ExpungeAllContentsOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg/expunge-all-contents")
+        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/msg/expunge-all-contents")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
         return client.executeRequest<Any, ExpungeAllContentsOut>(
@@ -183,7 +183,7 @@ class Message(private val client: HookSniffHttpClient) {
         messagePrecheckIn: MessagePrecheckIn,
         options: MessagePrecheckOptions = MessagePrecheckOptions(),
     ): MessagePrecheckOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg/precheck/active")
+        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/msg/precheck/active")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -201,7 +201,7 @@ class Message(private val client: HookSniffHttpClient) {
         msgId: String,
         options: MessageGetOptions = MessageGetOptions(),
     ): MessageOut {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg/$msgId")
+        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/msg/$msgId")
         options.withContent?.let { url.addQueryParameter("with_content", serializeQueryParam(it)) }
         return client.executeRequest<Any, MessageOut>("GET", url.build())
     }
@@ -213,7 +213,7 @@ class Message(private val client: HookSniffHttpClient) {
      * can't be replayed or resent once its payload has been deleted or expired.
      */
     suspend fun expungeContent(appId: String, msgId: String) {
-        val url = client.newUrlBuilder().encodedPath("/api/v1/app/$appId/msg/$msgId/content")
+        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/msg/$msgId/content")
         client.executeRequest<Any, Boolean>("DELETE", url.build())
     }
 }

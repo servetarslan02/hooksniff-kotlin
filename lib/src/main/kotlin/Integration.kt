@@ -1,29 +1,58 @@
-package com.hooksniff
+package com.hooksniff.kotlin
 
-import com.hooksniff.exceptions.ApiException
+import com.hooksniff.kotlin.models.IntegrationEventOut
+import com.hooksniff.kotlin.models.IntegrationIn
+import com.hooksniff.kotlin.models.IntegrationOut
+import com.hooksniff.kotlin.models.IntegrationStatsOut
+import com.hooksniff.kotlin.models.IntegrationTestResponse
+import com.hooksniff.kotlin.models.IntegrationUpdate
 
 class Integration(private val client: HookSniffHttpClient) {
-    fun list(): List<Map<String, Any?>> =
-        client.request("GET", "/api/v1/integrations")
+    /** List all integrations. */
+    suspend fun list(): List<IntegrationOut> {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations")
+        return client.executeRequest<Any, List<IntegrationOut>>("GET", url.build())
+    }
 
-    fun get(id: String): Map<String, Any?> =
-        client.request("GET", "/api/v1/integrations/$id")
+    /** Get an integration by ID. */
+    suspend fun get(id: String): IntegrationOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations/$id")
+        return client.executeRequest<Any, IntegrationOut>("GET", url.build())
+    }
 
-    fun create(body: Map<String, Any?>): Map<String, Any?> =
-        client.request("POST", "/api/v1/integrations", body)
+    /** Create a new integration. */
+    suspend fun create(integrationIn: IntegrationIn): IntegrationOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations")
+        return client.executeRequest<IntegrationIn, IntegrationOut>("POST", url.build(), reqBody = integrationIn)
+    }
 
-    fun update(id: String, body: Map<String, Any?>): Map<String, Any?> =
-        client.request("PUT", "/api/v1/integrations/$id", body)
+    /** Update an integration. */
+    suspend fun update(id: String, integrationUpdate: IntegrationUpdate): IntegrationOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations/$id")
+        return client.executeRequest<IntegrationUpdate, IntegrationOut>("PUT", url.build(), reqBody = integrationUpdate)
+    }
 
-    fun delete(id: String) =
-        client.request<Void>("DELETE", "/api/v1/integrations/$id")
+    /** Delete an integration. */
+    suspend fun delete(id: String) {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations/$id")
+        client.executeRequest<Any, Boolean>("DELETE", url.build())
+    }
 
-    fun test(id: String): Map<String, Any?> =
-        client.request("POST", "/api/v1/integrations/$id/test")
+    /** Test an integration. */
+    suspend fun test(id: String): IntegrationTestResponse {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations/$id/test")
+        return client.executeRequest<Any, IntegrationTestResponse>("POST", url.build())
+    }
 
-    fun listEvents(id: String, params: Map<String, String> = emptyMap()): List<Map<String, Any?>> =
-        client.request("GET", "/api/v1/integrations/$id/events", queryParams = params)
+    /** List events for an integration. */
+    suspend fun listEvents(id: String): List<IntegrationEventOut> {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations/$id/events")
+        return client.executeRequest<Any, List<IntegrationEventOut>>("GET", url.build())
+    }
 
-    fun getStats(id: String): Map<String, Any?> =
-        client.request("GET", "/api/v1/integrations/$id/stats")
+    /** Get stats for an integration. */
+    suspend fun getStats(id: String): IntegrationStatsOut {
+        val url = client.newUrlBuilder().encodedPath("/v1/integrations/$id/stats")
+        return client.executeRequest<Any, IntegrationStatsOut>("GET", url.build())
+    }
 }

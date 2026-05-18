@@ -1,5 +1,6 @@
 package com.hooksniff.kotlin
 
+import com.hooksniff.kotlin.exceptions.WebhookVerificationException
 import org.junit.Test
 import org.junit.Assert.*
 import javax.crypto.Mac
@@ -37,7 +38,7 @@ class WebhookTest {
         assertNotNull(result)
     }
 
-    @Test(expected = WebhookVerificationError::class)
+    @Test(expected = WebhookVerificationException::class)
     fun testRejectInvalidSignature() {
         val wh = Webhook(SECRET)
         val headers = mapOf(
@@ -48,7 +49,7 @@ class WebhookTest {
         wh.verify(PAYLOAD, headers)
     }
 
-    @Test(expected = WebhookVerificationError::class)
+    @Test(expected = WebhookVerificationException::class)
     fun testRejectOldTimestamp() {
         val wh = Webhook(SECRET)
         val oldTs = System.currentTimeMillis() / 1000 - 600
@@ -62,13 +63,13 @@ class WebhookTest {
     }
 
     @Test
-    fun testSvixBrandedHeaders() {
+    fun testHookSniffBrandedHeaders() {
         val wh = Webhook(SECRET)
         val sig = sign(SECRET, MSG_ID, TIMESTAMP, PAYLOAD)
         val headers = mapOf(
-            "svix-id" to MSG_ID,
-            "svix-timestamp" to TIMESTAMP.toString(),
-            "svix-signature" to sig
+            "hooksniff-id" to MSG_ID,
+            "hooksniff-timestamp" to TIMESTAMP.toString(),
+            "hooksniff-signature" to sig
         )
         val result = wh.verify(PAYLOAD, headers)
         assertNotNull(result)
