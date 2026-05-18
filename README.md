@@ -53,19 +53,17 @@ fun main() = runBlocking {
     )
 
     // List endpoints
-    val endpoints = client.endpoint.list("app_xxx")
+    val endpoints = client.endpoint.list()
     println("Endpoints: ${endpoints.data?.size}")
 
     // Create an endpoint
     val newEndpoint = client.endpoint.create(
-        "app_xxx",
         EndpointIn(url = "https://your-app.com/webhook")
     )
     println("Created: ${newEndpoint.id}")
 
     // Send a webhook message
     val message = client.message.create(
-        "app_xxx",
         MessageIn(
             eventType = "order.created",
             payload = mapOf("order_id" to "12345", "total" to 99.99)
@@ -175,7 +173,7 @@ The SDK throws `ApiException` for HTTP errors with status code and response body
 import com.hooksniff.kotlin.exceptions.ApiException
 
 try {
-    val endpoint = client.endpoint.get("app_xxx", "ep_xxx")
+    val endpoint = client.endpoint.get("ep_xxx")
 } catch (e: ApiException) {
     println("Status: ${e.statusCode}")  // e.g., 404
     println("Body: ${e.body}")          // JSON error response
@@ -212,12 +210,12 @@ All API methods are `suspend` functions. Use them within a coroutine scope:
 ```kotlin
 // In a coroutine scope
 runBlocking {
-    val endpoints = client.endpoint.list("app_xxx")
+    val endpoints = client.endpoint.list()
 }
 
 // Or in a ViewModel / CoroutineScope
 viewModelScope.launch {
-    val messages = client.message.list("app_xxx")
+    val messages = client.message.list()
 }
 ```
 
