@@ -91,3 +91,39 @@ object HookSniffApiExceptionFactory {
         }
     }
 }
+
+/** 408 Request Timeout — The server timed out waiting for the request */
+class RequestTimeoutException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Request timeout", 408, message, headers)
+
+/** 410 Gone — The resource has been permanently removed */
+class GoneException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Gone", 410, message, headers)
+
+/** 413 Payload Too Large — The request body exceeds the limit */
+class PayloadTooLargeException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Payload too large", 413, message, headers)
+
+/** 501 Not Implemented — The server does not support this functionality */
+class NotImplementedException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Not implemented", 501, message, headers)
+
+/** 507 Insufficient Storage — The server cannot store the representation */
+class InsufficientStorageException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Insufficient storage", 507, message, headers)
+
+/** 508 Loop Detected — The server detected an infinite loop */
+class LoopDetectedException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Loop detected", 508, message, headers)
+
+/** Timeout — request exceeded the configured timeout */
+class TimeoutException(message: String? = null) :
+    HookSniffApiException(message ?: "Request timeout", 0, null, emptyMap())
+
+/** Network error — connection failed, DNS error, etc. */
+class NetworkException(message: String? = null) :
+    HookSniffApiException(message ?: "Network error", 0, null, emptyMap())
+
+/** Authentication error — token invalid, expired, or missing */
+class AuthenticationException(message: String?, headers: Map<String, String> = emptyMap()) :
+    HookSniffApiException(message ?: "Authentication failed", 401, message, headers)
