@@ -19,7 +19,7 @@ class Inbound(private val client: HookSniffHttpClient) {
 
     /** Handle an inbound webhook. */
     suspend fun handleInbound(body: Map<String, Any?>): Map<String, Any?> {
-        val url = client.newUrlBuilder().encodedPath("/v1/inbound")
+        val url = client.newUrlBuilder().encodedPath("/v1/inbound/configs")
         return client.executeRequest<Map<String, Any?>, Map<String, Any?>>("POST", url.build(), reqBody = body)
     }
 }

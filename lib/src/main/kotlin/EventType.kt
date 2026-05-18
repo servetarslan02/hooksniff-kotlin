@@ -41,7 +41,7 @@ class EventType(private val client: HookSniffHttpClient) {
     suspend fun list(
         options: EventTypeListOptions = EventTypeListOptions()
     ): ListResponseEventTypeOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type")
+        val url = client.newUrlBuilder().encodedPath("/v1/events")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         options.order?.let { url.addQueryParameter("order", serializeQueryParam(it)) }
@@ -63,7 +63,7 @@ class EventType(private val client: HookSniffHttpClient) {
         eventTypeIn: EventTypeIn,
         options: EventTypeCreateOptions = EventTypeCreateOptions(),
     ): EventTypeOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type")
+        val url = client.newUrlBuilder().encodedPath("/v1/events")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -85,7 +85,7 @@ class EventType(private val client: HookSniffHttpClient) {
         eventTypeImportOpenApiIn: EventTypeImportOpenApiIn,
         options: EventTypeImportOpenapiOptions = EventTypeImportOpenapiOptions(),
     ): EventTypeImportOpenApiOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type/import/openapi")
+        val url = client.newUrlBuilder().encodedPath("/v1/events/import/openapi")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -99,13 +99,13 @@ class EventType(private val client: HookSniffHttpClient) {
 
     /** Get an event type. */
     suspend fun get(eventTypeName: String): EventTypeOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type/$eventTypeName")
+        val url = client.newUrlBuilder().encodedPath("/v1/events/$eventTypeName")
         return client.executeRequest<Any, EventTypeOut>("GET", url.build())
     }
 
     /** Update an event type. */
     suspend fun update(eventTypeName: String, eventTypeUpdate: EventTypeUpdate): EventTypeOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type/$eventTypeName")
+        val url = client.newUrlBuilder().encodedPath("/v1/events/$eventTypeName")
 
         return client.executeRequest<EventTypeUpdate, EventTypeOut>(
             "PUT",
@@ -126,14 +126,14 @@ class EventType(private val client: HookSniffHttpClient) {
         eventTypeName: String,
         options: EventTypeDeleteOptions = EventTypeDeleteOptions(),
     ) {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type/$eventTypeName")
+        val url = client.newUrlBuilder().encodedPath("/v1/events/$eventTypeName")
         options.expunge?.let { url.addQueryParameter("expunge", serializeQueryParam(it)) }
         client.executeRequest<Any, Boolean>("DELETE", url.build())
     }
 
     /** Partially update an event type. */
     suspend fun patch(eventTypeName: String, eventTypePatch: EventTypePatch): EventTypeOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/event-type/$eventTypeName")
+        val url = client.newUrlBuilder().encodedPath("/v1/events/$eventTypeName")
 
         return client.executeRequest<EventTypePatch, EventTypeOut>(
             "PATCH",

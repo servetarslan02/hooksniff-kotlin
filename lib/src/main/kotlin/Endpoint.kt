@@ -60,7 +60,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         appId: String,
         options: EndpointListOptions = EndpointListOptions(),
     ): ListResponseEndpointOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint")
+        val url = client.newUrlBuilder().encodedPath("/v1/endpoints")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         options.order?.let { url.addQueryParameter("order", serializeQueryParam(it)) }
@@ -77,7 +77,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         endpointIn: EndpointIn,
         options: EndpointCreateOptions = EndpointCreateOptions(),
     ): EndpointOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint")
+        val url = client.newUrlBuilder().encodedPath("/v1/endpoints")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -91,7 +91,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
 
     /** Get an endpoint. */
     suspend fun get(appId: String, endpointId: String): EndpointOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId")
+        val url = client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId")
         return client.executeRequest<Any, EndpointOut>("GET", url.build())
     }
 
@@ -101,7 +101,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         endpointId: String,
         endpointUpdate: EndpointUpdate,
     ): EndpointOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId")
+        val url = client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId")
 
         return client.executeRequest<EndpointUpdate, EndpointOut>(
             "PUT",
@@ -112,7 +112,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
 
     /** Delete an endpoint. */
     suspend fun delete(appId: String, endpointId: String) {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId")
+        val url = client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId")
         client.executeRequest<Any, Boolean>("DELETE", url.build())
     }
 
@@ -122,7 +122,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         endpointId: String,
         endpointPatch: EndpointPatch,
     ): EndpointOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId")
+        val url = client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId")
 
         return client.executeRequest<EndpointPatch, EndpointOut>(
             "PATCH",
@@ -158,7 +158,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/bulk-replay")
+                .encodedPath("/v1/endpoints/$endpointId/bulk-replay")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -173,7 +173,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
     /** Get the additional headers to be sent with the webhook. */
     suspend fun getHeaders(appId: String, endpointId: String): EndpointHeadersOut {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId/headers")
+            client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/headers")
         return client.executeRequest<Any, EndpointHeadersOut>("GET", url.build())
     }
 
@@ -184,7 +184,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         endpointHeadersIn: EndpointHeadersIn,
     ) {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId/headers")
+            client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/headers")
 
         client.executeRequest<EndpointHeadersIn, Boolean>(
             "PUT",
@@ -200,7 +200,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         endpointHeadersPatchIn: EndpointHeadersPatchIn,
     ) {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId/headers")
+            client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/headers")
 
         client.executeRequest<EndpointHeadersPatchIn, Boolean>(
             "PATCH",
@@ -233,7 +233,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         options: EndpointRecoverOptions = EndpointRecoverOptions(),
     ): RecoverOut {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId/recover")
+            client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/recover")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -272,7 +272,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/replay-missing")
+                .encodedPath("/v1/endpoints/$endpointId/replay-missing")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -292,7 +292,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
      */
     suspend fun getSecret(appId: String, endpointId: String): EndpointSecretOut {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId/secret")
+            client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/secret")
         return client.executeRequest<Any, EndpointSecretOut>("GET", url.build())
     }
 
@@ -310,7 +310,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/secret/rotate")
+                .encodedPath("/v1/endpoints/$endpointId/secret/rotate")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -332,7 +332,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/send-example")
+                .encodedPath("/v1/endpoints/$endpointId/send-example")
         val headers = Headers.Builder()
         options.idempotencyKey?.let { headers.add("idempotency-key", it) }
 
@@ -351,7 +351,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         options: EndpointGetStatsOptions = EndpointGetStatsOptions(),
     ): EndpointStats {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/endpoint/$endpointId/stats")
+            client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/stats")
         options.since?.let { url.addQueryParameter("since", serializeQueryParam(it)) }
         options.until?.let { url.addQueryParameter("until", serializeQueryParam(it)) }
         return client.executeRequest<Any, EndpointStats>("GET", url.build())
@@ -362,7 +362,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/transformation")
+                .encodedPath("/v1/endpoints/$endpointId/transformation")
         return client.executeRequest<Any, EndpointTransformationOut>("GET", url.build())
     }
 
@@ -375,7 +375,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/transformation")
+                .encodedPath("/v1/endpoints/$endpointId/transformation")
 
         client.executeRequest<EndpointTransformationPatch, Boolean>(
             "PATCH",
@@ -398,7 +398,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/app/$appId/endpoint/$endpointId/transformation")
+                .encodedPath("/v1/endpoints/$endpointId/transformation")
 
         client.executeRequest<EndpointTransformationIn, Boolean>(
             "PATCH",
