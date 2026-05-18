@@ -9,20 +9,21 @@ import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.UUID
 
-data class ResponseMetadata(val statusCode: Int, val requestId: String? = null, val rateLimitRemaining: Int? = null, val rateLimitReset: Int? = null, val headers: Map<String, List<String>> = emptyMap())
-
 open class HookSniffHttpClient
 internal constructor(
-    private val baseUrl: HttpUrl,
+    private val baseUrl_: HttpUrl,
+    private val apiKey_: String,
     private val defaultHeaders: Map<String, String>,
     private val retrySchedule: List<Long>,
     private val jsonDeserializer: Json = Json { ignoreUnknownKeys = true },
     private val debug: Boolean = false
 ) {
+    val baseUrl: String get() = baseUrl_.toString()
+    val apiKey: String get() = apiKey_
     private val client: OkHttpClient = OkHttpClient()
 
     fun newUrlBuilder(): HttpUrl.Builder {
-        return HttpUrl.Builder().scheme(baseUrl.scheme).host(baseUrl.host).port(baseUrl.port)
+        return HttpUrl.Builder().scheme(baseUrl_.scheme).host(baseUrl_.host).port(baseUrl_.port)
     }
 
     internal suspend inline fun <reified Req, reified Res> executeRequest(
@@ -57,7 +58,6 @@ internal constructor(
         val request = reqBuilder.build()
         val res = executeRequestWithRetry(request)
 
-        // if body is null panic
         if (res.body == null) {
             throw ApiException("Body is null", res.code)
         }
@@ -84,7 +84,6 @@ internal constructor(
             val res = try {
                 client.newCall(currentRequest).execute()
             } catch (e: java.net.SocketTimeoutException) {
-                // Timeout — retry with backoff
                 if (retryCount >= retrySchedule.size) throw e
                 val delayMs = retrySchedule[retryCount]
                 delay(delayMs)
@@ -104,7 +103,6 @@ internal constructor(
                 continue
             }
 
-            // 429 Rate Limit — respect Retry-After header
             if (res.code == 429 && retryCount < retrySchedule.size) {
                 val retryAfter = res.header("Retry-After")
                 val delayMs = retryAfter?.toLongOrNull()?.times(1000) ?: retrySchedule[retryCount]
@@ -117,7 +115,6 @@ internal constructor(
                 continue
             }
 
-            // 5xx Server Error — exponential backoff
             if (res.code >= 500 && retryCount < retrySchedule.size) {
                 res.close()
                 delay(retrySchedule[retryCount])

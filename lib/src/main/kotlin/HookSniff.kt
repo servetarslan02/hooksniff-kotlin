@@ -28,7 +28,7 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         val sdkUA = "hooksniff-libs/${Version}/kotlin"
         val defaultHeaders =
             mapOf("User-Agent" to sdkUA, "X-HookSniff-SDK" to sdkUA, "Authorization" to "Bearer $token")
-        val httpClient = HookSniffHttpClient(parsedUrl, defaultHeaders, options.retrySchedule, debug = options.debug)
+        val httpClient = HookSniffHttpClient(parsedUrl, token, defaultHeaders, options.retrySchedule, debug = options.debug)
         authentication = Authentication(httpClient)
         endpoint = Endpoint(httpClient)
         eventType = EventType(httpClient)
