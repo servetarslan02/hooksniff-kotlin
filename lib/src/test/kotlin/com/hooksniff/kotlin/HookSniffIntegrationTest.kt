@@ -12,7 +12,7 @@ class HookSniffIntegrationTest {
 
     companion object {
         const val BASE_URL = "https://hooksniff-api-1046140057667.europe-west1.run.app"
-        const val DEMO_EMAIL = "demo@hooksniff.vercel.app"
+        const val DEMO_EMAIL = "servetarslan02@gmail.com"
         const val DEMO_PASSWORD = "Demo1234!"
     }
 
