@@ -1,0 +1,108 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "io.github.servetarslan02",
+    "module": "hooksniff-sdk-kotlin",
+    "version": "1.2.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "hooksniff-sdk-kotlin-1.2.0.jar",
+          "url": "hooksniff-sdk-kotlin-1.2.0.jar",
+          "size": 1084120,
+          "sha512": "32e0badffe507686faa80ba33054e278ad2948d66fcae05a58ced25661fd1936faabd0bf8d5fab85d087018eee989aeabf087d073128850384f955e8d8501382",
+          "sha256": "6508a3c1834f4e5168fb046ef6f9d2d3ecc5a55694b535fec67ae49eb42c48d8",
+          "sha1": "66bd6c0c7c09976959d47d38256988221244beab",
+          "md5": "389e8a7da3a9b6407c813010d1c7414b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-datetime",
+          "version": {
+            "requires": "0.6.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "2.1.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "2.1.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.5.2"
+          }
+        },
+        {
+          "group": "com.squareup.okhttp3",
+          "module": "okhttp",
+          "version": {
+            "requires": "4.12.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "hooksniff-sdk-kotlin-1.2.0.jar",
+          "url": "hooksniff-sdk-kotlin-1.2.0.jar",
+          "size": 1084120,
+          "sha512": "32e0badffe507686faa80ba33054e278ad2948d66fcae05a58ced25661fd1936faabd0bf8d5fab85d087018eee989aeabf087d073128850384f955e8d8501382",
+          "sha256": "6508a3c1834f4e5168fb046ef6f9d2d3ecc5a55694b535fec67ae49eb42c48d8",
+          "sha1": "66bd6c0c7c09976959d47d38256988221244beab",
+          "md5": "389e8a7da3a9b6407c813010d1c7414b"
+        }
+      ]
+    }
+  ]
+}
