@@ -288,7 +288,7 @@ class Endpoint(private val client: HookSniffHttpClient) {
      * Get the endpoint's signing secret.
      *
      * This is used to verify the authenticity of the webhook. For more information please refer to
-     * [the consuming webhooks docs](https://docs.hooksniff.com/consuming-webhooks/).
+     * [the consuming webhooks docs](https://hooksniff.vercel.app/docs).
      */
     suspend fun getSecret(appId: String, endpointId: String): EndpointSecretOut {
         val url =

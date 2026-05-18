@@ -4,7 +4,7 @@
   <a href="https://github.com/servetarslan02/HookSniff"><img src="https://img.shields.io/github/license/servetarslan02/HookSniff" alt="License"></a>
 </p>
 
-Kotlin SDK for the [HookSniff](https://hooksniff.com) webhook delivery platform.
+Kotlin SDK for the [HookSniff](https://hooksniff.vercel.app) webhook delivery platform.
 
 ## Installation
 
@@ -40,6 +40,6 @@ val payload = wh.verify(body, headers)
 
 ## Links
 
-- [Documentation](https://docs.hooksniff.com)
-- [API Reference](https://api.hooksniff.com)
+- [Documentation](https://hooksniff.vercel.app/docs)
+- [API Reference](https://hooksniff-api-1046140057667.europe-west1.run.app)
 - [GitHub](https://github.com/servetarslan02/HookSniff)
