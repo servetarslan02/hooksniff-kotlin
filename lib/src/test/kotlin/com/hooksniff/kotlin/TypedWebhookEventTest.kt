@@ -145,4 +145,70 @@ class TypedWebhookEventTest {
         assertEquals("ünïcödé", data.appId)
         assertEquals("日本語", data.endpointId)
     }
+
+    @Test
+    fun testLargeData() {
+        val event = WebhookEvent(event = "endpoint.created", data = mapOf("appId" to "a".repeat(10000), "endpointId" to "e".repeat(10000)), timestamp = "")
+        val data = event.toEndpointCreatedData()
+        assertEquals(10000, data.appId.length)
+    }
+
+    @Test
+    fun testSpecialCharacters() {
+        val event = WebhookEvent(event = "endpoint.created", data = mapOf("appId" to "a@b.c", "endpointId" to "e#1"), timestamp = "")
+        val data = event.toEndpointCreatedData()
+        assertEquals("a@b.c", data.appId)
+    }
+
+    @Test
+    fun testTriggerNone() {
+        val event = WebhookEvent(event = "endpoint.disabled", data = mapOf("appId" to "a", "endpointId" to "e", "trigger" to "none"), timestamp = "")
+        val data = event.toEndpointDisabledData()
+        assertEquals("none", data.trigger)
+    }
+
+    @Test
+    fun testTriggerFirstFailure() {
+        val event = WebhookEvent(event = "endpoint.disabled", data = mapOf("appId" to "a", "endpointId" to "e", "trigger" to "first-failure"), timestamp = "")
+        val data = event.toEndpointDisabledData()
+        assertEquals("first-failure", data.trigger)
+    }
+
+    @Test
+    fun testFailSince() {
+        val event = WebhookEvent(event = "endpoint.disabled", data = mapOf("appId" to "a", "endpointId" to "e", "failSince" to "2026-01"), timestamp = "")
+        val data = event.toEndpointDisabledData()
+        assertEquals("2026-01", data.failSince)
+    }
+
+    @Test
+    fun testAllEndpointTypes() {
+        for (type in listOf("endpoint.created", "endpoint.updated", "endpoint.deleted", "endpoint.enabled", "endpoint.disabled")) {
+            assertEquals(type, WebhookEvent(event = type, data = emptyMap(), timestamp = "").event)
+        }
+    }
+
+    @Test
+    fun testGetExistingKey() {
+        val event = WebhookEvent(event = "test", data = mapOf("x" to 1), timestamp = "")
+        assertEquals(1, event["x"])
+    }
+
+    @Test
+    fun testContainsExistingKey() {
+        val event = WebhookEvent(event = "test", data = mapOf("x" to 1), timestamp = "")
+        assertTrue("x" in event)
+    }
+
+    @Test
+    fun testContainsMissingKey() {
+        val event = WebhookEvent(event = "test", data = mapOf("x" to 1), timestamp = "")
+        assertFalse("missing" in event)
+    }
+
+    @Test
+    fun testEventTypeProperty() {
+        val event = WebhookEvent(event = "endpoint.created", data = emptyMap(), timestamp = "")
+        assertEquals("endpoint.created", event.eventType)
+    }
 }
