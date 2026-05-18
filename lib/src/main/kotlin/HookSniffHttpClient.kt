@@ -69,33 +69,60 @@ internal constructor(
     }
 
     suspend fun executeRequestWithRetry(request: Request): Response {
-        var res = client.newCall(request).execute()
+        var currentRequest = request
+        var retryCount = 0
 
-        // 429 Rate Limit — respect Retry-After header
-        if (res.code == 429) {
-            val retryAfter = res.header("Retry-After")
-            val delayMs = retryAfter?.toLongOrNull()?.times(1000) ?: 1000L
-            delay(delayMs)
-            val newReq = request.newBuilder()
-                .header("hooksniff-retry-count", "1")
-                .build()
-            res = client.newCall(newReq).execute()
-        }
-
-        // 5xx Server Error — exponential backoff
-        if (res.code >= 500) {
-            retrySchedule.forEachIndexed { index, sleepTime ->
-                run {
-                    delay(sleepTime)
-                    val newReq =
-                        request
-                            .newBuilder()
-                            .header("hooksniff-retry-count", (index + 1).toString())
-                            .build()
-                    res = client.newCall(newReq).execute()
-                }
+        while (retryCount <= retrySchedule.size) {
+            val res = try {
+                client.newCall(currentRequest).execute()
+            } catch (e: java.net.SocketTimeoutException) {
+                // Timeout — retry with backoff
+                if (retryCount >= retrySchedule.size) throw e
+                val delayMs = retrySchedule[retryCount]
+                delay(delayMs)
+                currentRequest = request.newBuilder()
+                    .header("hooksniff-retry-count", (retryCount + 1).toString())
+                    .build()
+                retryCount++
+                continue
+            } catch (e: java.net.SocketException) {
+                if (retryCount >= retrySchedule.size) throw e
+                val delayMs = retrySchedule[retryCount]
+                delay(delayMs)
+                currentRequest = request.newBuilder()
+                    .header("hooksniff-retry-count", (retryCount + 1).toString())
+                    .build()
+                retryCount++
+                continue
             }
+
+            // 429 Rate Limit — respect Retry-After header
+            if (res.code == 429 && retryCount < retrySchedule.size) {
+                val retryAfter = res.header("Retry-After")
+                val delayMs = retryAfter?.toLongOrNull()?.times(1000) ?: retrySchedule[retryCount]
+                res.close()
+                delay(delayMs)
+                currentRequest = request.newBuilder()
+                    .header("hooksniff-retry-count", (retryCount + 1).toString())
+                    .build()
+                retryCount++
+                continue
+            }
+
+            // 5xx Server Error — exponential backoff
+            if (res.code >= 500 && retryCount < retrySchedule.size) {
+                res.close()
+                delay(retrySchedule[retryCount])
+                currentRequest = request.newBuilder()
+                    .header("hooksniff-retry-count", (retryCount + 1).toString())
+                    .build()
+                retryCount++
+                continue
+            }
+
+            return res
         }
-        return res
+
+        return client.newCall(currentRequest).execute()
     }
 }

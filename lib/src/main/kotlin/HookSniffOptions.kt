@@ -2,7 +2,7 @@ package com.hooksniff.kotlin
 
 data class HookSniffOptions(
     var baseUrl: String? = null,
-    val retrySchedule: List<Long> = listOf(50, 100, 200),
+    val retrySchedule: List<Long> = listOf(1000, 2000, 4000),
 ) {
     init {
         if (retrySchedule.count() > 5) {
