@@ -9,6 +9,8 @@ import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.UUID
 
+data class ResponseMetadata(val statusCode: Int, val requestId: String? = null, val rateLimitRemaining: Int? = null, val rateLimitReset: Int? = null, val headers: Map<String, List<String>> = emptyMap())
+
 open class HookSniffHttpClient
 internal constructor(
     private val baseUrl: HttpUrl,
