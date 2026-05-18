@@ -1,4 +1,4 @@
-package com.hooksniff
+package com.hooksniff.kotlin
 
 /**
  * Pagination Helper for HookSniff Kotlin SDK.
