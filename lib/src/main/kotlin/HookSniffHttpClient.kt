@@ -16,7 +16,8 @@ internal constructor(
     private val baseUrl: HttpUrl,
     private val defaultHeaders: Map<String, String>,
     private val retrySchedule: List<Long>,
-    private val jsonDeserializer: Json = Json { ignoreUnknownKeys = true }
+    private val jsonDeserializer: Json = Json { ignoreUnknownKeys = true },
+    private val debug: Boolean = false
 ) {
     private val client: OkHttpClient = OkHttpClient()
 
@@ -74,6 +75,11 @@ internal constructor(
         var currentRequest = request
         var retryCount = 0
 
+        if (debug) {
+            println("[HookSniff] → ${request.method} ${request.url}")
+        }
+        val startTime = System.currentTimeMillis()
+
         while (retryCount <= retrySchedule.size) {
             val res = try {
                 client.newCall(currentRequest).execute()
@@ -125,6 +131,11 @@ internal constructor(
             return res
         }
 
-        return client.newCall(currentRequest).execute()
+        val finalResponse = client.newCall(currentRequest).execute()
+        if (debug) {
+            val elapsed = System.currentTimeMillis() - startTime
+            println("[HookSniff] ← ${finalResponse.code} (${elapsed}ms)")
+        }
+        return finalResponse
     }
 }

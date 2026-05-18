@@ -27,7 +27,7 @@ class HookSniff(token: String, options: HookSniffOptions = HookSniffOptions()) {
         val parsedUrl = options.baseUrl?.toHttpUrlOrNull() ?: throw Exception("Invalid base url")
         val defaultHeaders =
             mapOf("User-Agent" to "hooksniff-libs/${Version}/kotlin", "Authorization" to "Bearer $token")
-        val httpClient = HookSniffHttpClient(parsedUrl, defaultHeaders, options.retrySchedule)
+        val httpClient = HookSniffHttpClient(parsedUrl, defaultHeaders, options.retrySchedule, debug = options.debug)
         authentication = Authentication(httpClient)
         endpoint = Endpoint(httpClient)
         eventType = EventType(httpClient)
