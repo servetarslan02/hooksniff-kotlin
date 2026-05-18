@@ -150,7 +150,7 @@ val signature = webhook.sign(msgId = "msg_xxx", timestamp = System.currentTimeMi
 | `message` | list, create, get, expungeContent, expungeAllContents, precheck | Send and manage webhook messages |
 | `messageAttempt` | listByEndpoint, listByMsg, listAttemptedMessages, get, expungeContent, listAttemptedDestinations, resend | Track delivery attempts |
 | `eventType` | list, create, get, update, delete, patch, importOpenapi | Manage event types |
-| `authentication` | appPortalAccess, expireAll, dashboardAccess, logout, streamLogout, streamPortalAccess, streamExpireAll, getStreamPollerToken, rotateStreamPollerToken | Auth operations |
+| `authentication` | logout, streamLogout, getStreamPollerToken, rotateStreamPollerToken | Auth operations |
 | `statistics` | aggregateAppStats, aggregateEventTypes | Usage statistics |
 | `health` | get | API health check |
 
@@ -165,7 +165,7 @@ val signature = webhook.sign(msgId = "msg_xxx", timestamp = System.currentTimeMi
 | `inbound` | listConfigs, createConfig, handleInbound | Inbound webhook proxy |
 | `connector` | list, get, listConfigs, createConfig, updateConfig, deleteConfig | Third-party connectors |
 | `integration` | list, get, create, update, delete, test, listEvents, getStats | Integration management |
-| `stream` | listChannels, getChannel, createChannel, updateChannel, deleteChannel, listMessages, listSubscriptions, disconnectSubscription, publishEvent | Real-time streaming |
+| `stream` | listChannels, getChannel, createChannel, updateChannel, deleteChannel, listMessages, subscribe, publishEvent | Real-time streaming |
 
 ## Error Handling
 
