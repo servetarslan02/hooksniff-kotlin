@@ -230,7 +230,7 @@ viewModelScope.launch {
 ## Links
 
 - 📖 [Documentation](https://hooksniff.vercel.app/docs)
-- 🔑 [API Reference](https://hooksniff-api-1046140057667.europe-west1.run.app/v1/docs)
+- 🔑 [API Reference](https://hooksniff.vercel.app/docs)
 - 💰 [Pricing](https://hooksniff.vercel.app/pricing)
 - 🐛 [Report a Bug](https://github.com/servetarslan02/hooksniff-kotlin/issues)
 - 💬 [GitHub Discussions](https://github.com/servetarslan02/HookSniff/discussions)
