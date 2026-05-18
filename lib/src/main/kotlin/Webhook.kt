@@ -51,6 +51,173 @@ class Webhook {
         verifyInternal(msgId, msgSignature, msgTimestamp, payload)
     }
 
+    /**
+     * Verify and parse a webhook payload using java.net.http.HttpHeaders.
+     *
+     * Returns a [WebhookEvent] with typed fields: `event`, `data`, `timestamp`.
+     */
+    @Throws(WebhookVerificationException::class)
+    fun verifyAndParse(payload: String?, headers: java.net.http.HttpHeaders): WebhookEvent {
+        verify(payload, headers)
+        return parsePayload(payload)
+    }
+
+    /**
+     * Verify and parse a webhook payload using a Map<String, String>.
+     *
+     * Returns a [WebhookEvent] with typed fields: `event`, `data`, `timestamp`.
+     */
+    @Throws(WebhookVerificationException::class)
+    fun verifyAndParse(payload: String?, headers: Map<String, String>): WebhookEvent {
+        verify(payload, headers)
+        return parsePayload(payload)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun parsePayload(payload: String?): WebhookEvent {
+        if (payload.isNullOrBlank()) {
+            return WebhookEvent(event = "", data = emptyMap(), timestamp = "")
+        }
+        return try {
+            // Use basic JSON parsing without external dependency
+            val parsed = parseJsonString(payload)
+            val event = parsed["event"]?.toString() ?: parsed["eventType"]?.toString() ?: ""
+            val data = when (val d = parsed["data"]) {
+                is Map<*, *> -> d as Map<String, Any?>
+                else -> emptyMap()
+            }
+            val timestamp = parsed["timestamp"]?.toString() ?: ""
+            WebhookEvent(event = event, data = data, timestamp = timestamp)
+        } catch (e: Exception) {
+            WebhookEvent(event = "", data = emptyMap(), timestamp = "")
+        }
+    }
+
+    private fun parseJsonString(json: String): Map<String, Any?> {
+        val result = mutableMapOf<String, Any?>()
+        val trimmed = json.trim()
+        if (!trimmed.startsWith("{")) return result
+
+        // Extract simple string fields
+        extractString(trimmed, "event")?.let { result["event"] = it }
+        extractString(trimmed, "eventType")?.let { result["eventType"] = it }
+        extractString(trimmed, "timestamp")?.let { result["timestamp"] = it }
+
+        // Extract data as a map
+        val dataIndex = trimmed.indexOf("\"data\"")
+        if (dataIndex >= 0) {
+            val colonIndex = trimmed.indexOf(":", dataIndex + 6)
+            if (colonIndex >= 0) {
+                val braceStart = trimmed.indexOf("{", colonIndex)
+                if (braceStart >= 0) {
+                    var depth = 0
+                    var end = braceStart
+                    for (i in braceStart until trimmed.length) {
+                        if (trimmed[i] == '{') depth++
+                        if (trimmed[i] == '}') depth--
+                        if (depth == 0) { end = i + 1; break }
+                    }
+                    result["data"] = parseNestedJson(trimmed.substring(braceStart, end))
+                }
+            }
+        }
+
+        return result
+    }
+
+    private fun extractString(json: String, key: String): String? {
+        val search = "\"$key\""
+        val index = json.indexOf(search)
+        if (index < 0) return null
+
+        val colonIndex = json.indexOf(":", index + search.length)
+        if (colonIndex < 0) return null
+
+        val start = json.indexOf("\"", colonIndex + 1)
+        if (start < 0) return null
+
+        val sb = StringBuilder()
+        var i = start + 1
+        while (i < json.length) {
+            if (json[i] == '\\') { i += 2; continue }
+            if (json[i] == '"') break
+            sb.append(json[i])
+            i++
+        }
+        return sb.toString()
+    }
+
+    private fun parseNestedJson(json: String): Map<String, Any?> {
+        val result = mutableMapOf<String, Any?>()
+        val trimmed = json.trim()
+        if (!trimmed.startsWith("{")) return result
+
+        var i = 1
+        while (i < trimmed.length - 1) {
+            while (i < trimmed.length && trimmed[i].isWhitespace()) i++
+            if (i >= trimmed.length - 1 || trimmed[i] == '}') break
+
+            if (trimmed[i] != '"') { i++; continue }
+            i++
+            val keyStart = i
+            while (i < trimmed.length && trimmed[i] != '"') {
+                if (trimmed[i] == '\\') i++
+                i++
+            }
+            val key = trimmed.substring(keyStart, i)
+            i++
+
+            while (i < trimmed.length && (trimmed[i] == ':' || trimmed[i].isWhitespace())) i++
+
+            if (i >= trimmed.length) break
+            when (trimmed[i]) {
+                '"' -> {
+                    i++
+                    val valStart = i
+                    while (i < trimmed.length) {
+                        if (trimmed[i] == '\\') { i += 2; continue }
+                        if (trimmed[i] == '"') break
+                        i++
+                    }
+                    result[key] = trimmed.substring(valStart, i)
+                    i++
+                }
+                '{' -> {
+                    var depth = 0; val start = i
+                    for (j in i until trimmed.length) {
+                        if (trimmed[j] == '{') depth++
+                        if (trimmed[j] == '}') depth--
+                        if (depth == 0) { i = j + 1; break }
+                    }
+                    result[key] = parseNestedJson(trimmed.substring(start, i))
+                }
+                '[' -> {
+                    var depth = 0
+                    for (j in i until trimmed.length) {
+                        if (trimmed[j] == '[') depth++
+                        if (trimmed[j] == ']') depth--
+                        if (depth == 0) { i = j + 1; break }
+                    }
+                }
+                't', 'f' -> {
+                    result[key] = trimmed.startsWith("true", i)
+                    i += if (trimmed.startsWith("true", i)) 4 else 5
+                }
+                'n' -> { result[key] = null; i += 4 }
+                else -> {
+                    val start = i
+                    while (i < trimmed.length && ",} ]".indexOf(trimmed[i]) < 0) i++
+                    val numStr = trimmed.substring(start, i).trim()
+                    result[key] = numStr.toLongOrNull() ?: numStr.toDoubleOrNull() ?: numStr
+                }
+            }
+
+            while (i < trimmed.length && (trimmed[i] == ',' || trimmed[i].isWhitespace())) i++
+        }
+
+        return result
+    }
+
     private fun verifyInternal(msgId: String, msgSignature: String, msgTimestamp: String, payload: String?) {
         val timestamp = verifyTimestamp(msgTimestamp)
         val expectedSignature: String =
