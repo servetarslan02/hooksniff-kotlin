@@ -142,7 +142,7 @@ class MessageAttempt(private val client: HookSniffHttpClient) {
         options: MessageAttemptListByEndpointOptions = MessageAttemptListByEndpointOptions(),
     ): ListResponseMessageAttemptOut {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/app/$appId/attempt/endpoint/$endpointId")
+            client.newUrlBuilder().encodedPath("/v1/webhooks/attempts/endpoint/$endpointId")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         options.status?.let { url.addQueryParameter("status", serializeQueryParam(it)) }
@@ -175,7 +175,7 @@ class MessageAttempt(private val client: HookSniffHttpClient) {
         msgId: String,
         options: MessageAttemptListByMsgOptions = MessageAttemptListByMsgOptions(),
     ): ListResponseMessageAttemptOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/app/$appId/attempt/msg/$msgId")
+        val url = client.newUrlBuilder().encodedPath("/v1/webhooks/$msgId/attempts")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         options.status?.let { url.addQueryParameter("status", serializeQueryParam(it)) }
@@ -213,7 +213,7 @@ class MessageAttempt(private val client: HookSniffHttpClient) {
         options: MessageAttemptListAttemptedMessagesOptions =
             MessageAttemptListAttemptedMessagesOptions(),
     ): ListResponseEndpointMessageOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/endpoints/$endpointId/msg")
+        val url = client.newUrlBuilder().encodedPath("/v1/webhooks/endpoint/$endpointId")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         options.channel?.let { url.addQueryParameter("channel", it) }
@@ -237,7 +237,7 @@ class MessageAttempt(private val client: HookSniffHttpClient) {
         options: MessageAttemptGetOptions = MessageAttemptGetOptions(),
     ): MessageAttemptOut {
         val url =
-            client.newUrlBuilder().encodedPath("/v1/webhooks/$msgId/attempt/$attemptId")
+            client.newUrlBuilder().encodedPath("/v1/webhooks/$msgId/attempts/$attemptId")
         options.expandedStatuses?.let {
             url.addQueryParameter("expanded_statuses", serializeQueryParam(it))
         }
@@ -254,7 +254,7 @@ class MessageAttempt(private val client: HookSniffHttpClient) {
         val url =
             client
                 .newUrlBuilder()
-                .encodedPath("/v1/webhooks/$msgId/attempt/$attemptId/content")
+                .encodedPath("/v1/webhooks/$msgId/attempts/$attemptId/content")
         client.executeRequest<Any, Boolean>("DELETE", url.build())
     }
 
@@ -270,7 +270,7 @@ class MessageAttempt(private val client: HookSniffHttpClient) {
         options: MessageAttemptListAttemptedDestinationsOptions =
             MessageAttemptListAttemptedDestinationsOptions(),
     ): ListResponseMessageEndpointOut {
-        val url = client.newUrlBuilder().encodedPath("/v1/webhooks/$msgId/endpoint")
+        val url = client.newUrlBuilder().encodedPath("/v1/webhooks/$msgId/endpoints")
         options.limit?.let { url.addQueryParameter("limit", serializeQueryParam(it)) }
         options.iterator?.let { url.addQueryParameter("iterator", it) }
         return client.executeRequest<Any, ListResponseMessageEndpointOut>("GET", url.build())
