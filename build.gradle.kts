@@ -73,9 +73,10 @@ publishing {
 }
 
 signing {
-    val signingKey = findProperty("signingKey") as? String ?: System.getenv("GPG_SIGNING_KEY")?.trim()
-    val signingPassword = findProperty("signingPassword") as? String ?: System.getenv("GPG_SIGNING_PASSWORD")?.trim() ?: ""
-    if (!signingKey.isNullOrBlank() && signingKey.contains("BEGIN PGP")) {
+    // ORG_GRADLE_PROJECT_signingKey → findProperty("signingKey")
+    val signingKey = findProperty("signingKey") as? String
+    val signingPassword = findProperty("signingPassword") as? String ?: ""
+    if (!signingKey.isNullOrBlank()) {
         useInMemoryPgpKeys(signingKey, signingPassword)
         sign(publishing.publications["mavenJava"])
     }
