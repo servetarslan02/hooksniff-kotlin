@@ -82,7 +82,13 @@ signing {
     val signingKey = findProperty("signingKey") as String? ?: System.getenv("ORG_GRADLE_PROJECT_signingKey")
     val signingPassword = findProperty("signingPassword") as String? ?: System.getenv("ORG_GRADLE_PROJECT_signingPassword")
     if (!signingKey.isNullOrEmpty()) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
+        // Key is base64-encoded in GitHub Secret to preserve newlines
+        val decodedKey = try {
+            String(java.util.Base64.getDecoder().decode(signingKey))
+        } catch (e: Exception) {
+            signingKey // fallback: use as-is if not base64
+        }
+        useInMemoryPgpKeys(decodedKey, signingPassword)
         sign(publishing.publications["mavenJava"])
     }
 }
