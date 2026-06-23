@@ -1,0 +1,35 @@
+package com.hooksniff
+
+class HookSniff(apiKey: String, config: ClientConfig = ClientConfig()) {
+    private val http = HttpTransport(apiKey, config)
+
+    val application = ApplicationResource(http)
+    val endpoint = EndpointResource(http)
+    val webhook = WebhookResource(http)
+    val apiKey = ApiKeyResource(http)
+    val analytics = AnalyticsResource(http)
+    val search = SearchResource(http)
+    val health = HealthResource(http)
+    val team = TeamResource(http)
+    val billing = BillingResource(http)
+    val notification = NotificationResource(http)
+    val cortex = CortexResource(http)
+    val template = TemplateResource(http)
+    val schema = SchemaResource(http)
+    val alert = AlertResource(http)
+    val connector = ConnectorResource(http)
+    val stream = StreamResource(http)
+    val backgroundTask = BackgroundTaskResource(http)
+    val integration = IntegrationResource(http)
+    val serviceToken = ServiceTokenResource(http)
+    val operationalWebhook = OperationalWebhookResource(http)
+    val rateLimit = RateLimitResource(http)
+    val audit = AuditResource(http)
+    val sso = SsoResource(http)
+    val customDomain = CustomDomainResource(http)
+    val environment = EnvironmentResource(http)
+    val broadcast = BroadcastResource(http)
+    val transform = TransformResource(http)
+
+    fun me(): User = jsonTo(http.request("GET", "/v1/auth/me"))
+}
