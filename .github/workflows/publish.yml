@@ -16,12 +16,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Decode GPG key
+        run: |
+          echo "${{ secrets.GPG_SIGNING_KEY }}" | base64 -d > /tmp/gpg-key.asc
+          echo "GPG_KEY<<EOF" >> $GITHUB_ENV
+          cat /tmp/gpg-key.asc >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          rm /tmp/gpg-key.asc
+
       - name: Build and Publish
         run: |
           chmod +x gradlew
           ./gradlew publishMavenJavaPublicationToOSSRHRepository --no-daemon
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          GPG_SIGNING_PASSWORD: ${{ secrets.GPG_SIGNING_PASSWORD }}
+          OSSRH_PASSWORD: *** secrets.OSSRH_PASSWORD }}
+          GPG_SIGNING_KEY: *** env.GPG_KEY }}
+          GPG_SIGNING_PASSWORD: *** secrets.GPG_SIGNING_PASSWORD }}
