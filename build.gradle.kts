@@ -73,9 +73,10 @@ publishing {
 }
 
 signing {
-    val signingKey = System.getenv("GPG_SIGNING_KEY") ?: findProperty("signingKey") as? String
+    val signingKeyB64 = System.getenv("GPG_SIGNING_KEY") ?: findProperty("signingKey") as? String
     val signingPassword = System.getenv("GPG_SIGNING_PASSWORD") ?: findProperty("signingPassword") as? String
-    if (signingKey != null && signingPassword != null) {
+    if (signingKeyB64 != null && signingPassword != null) {
+        val signingKey = String(java.util.Base64.getDecoder().decode(signingKeyB64))
         useInMemoryPgpKeys(signingKey, signingPassword)
         sign(publishing.publications["mavenJava"])
     }
