@@ -1,4 +1,4 @@
-name: Publish to Maven Central
+name: Publish to GitHub Packages
 
 on:
   push:
@@ -8,6 +8,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -16,17 +18,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Import GPG key
-        run: |
-          echo "${{ secrets.GPG_SIGNING_KEY }}" | gpg --batch --import || true
-          gpg --list-secret-keys
-
-      - name: Build and Publish
+      - name: Publish
         run: |
           chmod +x gradlew
-          ./gradlew publishMavenJavaPublicationToOSSRHRepository --no-daemon -PsigningPassword="${{ secrets.GPG_SIGNING_PASSWORD }}"
+          ./gradlew publishMavenJavaPublicationToGitHubPackagesRepository --no-daemon
         env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: *** secrets.OSSRH_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.GPG_SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.GPG_SIGNING_PASSWORD }}
+          GITHUB_TOKEN: *** secrets.GITHUB_TOKEN }}
