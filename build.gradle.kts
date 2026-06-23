@@ -73,23 +73,10 @@ publishing {
 }
 
 signing {
-    val signingKeyB64 = System.getenv("GPG_SIGNING_KEY")?.trim()
-    val signingPassword = System.getenv("GPG_SIGNING_PASSWORD")?.trim() ?: ""
-    if (!signingKeyB64.isNullOrBlank()) {
-        try {
-            val decoded = java.util.Base64.getDecoder().decode(signingKeyB64)
-            val signingKey = String(decoded, Charsets.UTF_8)
-            if (signingKey.contains("BEGIN PGP PRIVATE KEY")) {
-                useInMemoryPgpKeys(signingKey, signingPassword)
-                sign(publishing.publications["mavenJava"])
-                logger.lifecycle("✅ GPG signing configured")
-            } else {
-                logger.warn("⚠️ GPG key decoded but no PGP header found")
-            }
-        } catch (e: Exception) {
-            logger.warn("⚠️ GPG signing failed: ${e.message}")
-        }
-    } else {
-        logger.warn("⚠️ GPG_SIGNING_KEY not set, skipping signing")
+    val signingKey = findProperty("signingKey") as? String ?: System.getenv("GPG_SIGNING_KEY")?.trim()
+    val signingPassword = findProperty("signingPassword") as? String ?: System.getenv("GPG_SIGNING_PASSWORD")?.trim() ?: ""
+    if (!signingKey.isNullOrBlank() && signingKey.contains("BEGIN PGP")) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications["mavenJava"])
     }
 }
