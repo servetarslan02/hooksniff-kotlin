@@ -32,8 +32,8 @@ publishing {
             name = "OSSRH"
             url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
-                username = System.getenv("OSSRH_USERNAME") ?: ""
-                password = System.getenv("OSSRH_PASSWORD") ?: ""
+                username = findProperty("OSSRH_USERNAME") as String? ?: System.getenv("ORG_GRADLE_PROJECT_OSSRH_USERNAME") ?: ""
+                password = findProperty("OSSRH_PASSWORD") as String? ?: System.getenv("ORG_GRADLE_PROJECT_OSSRH_PASSWORD") ?: ""
             }
         }
         maven {
@@ -79,10 +79,10 @@ publishing {
 }
 
 signing {
-    val gpgKey = System.getenv("GPG_SIGNING_KEY")
-    val gpgPassword = System.getenv("GPG_SIGNING_PASSWORD")
-    if (!gpgKey.isNullOrEmpty()) {
-        useInMemoryPgpKeys(gpgKey, gpgPassword)
+    val signingKey = findProperty("signingKey") as String? ?: System.getenv("ORG_GRADLE_PROJECT_signingKey")
+    val signingPassword = findProperty("signingPassword") as String? ?: System.getenv("ORG_GRADLE_PROJECT_signingPassword")
+    if (!signingKey.isNullOrEmpty()) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
         sign(publishing.publications["mavenJava"])
     }
 }
