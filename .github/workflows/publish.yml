@@ -1,26 +1,16 @@
-name: Publish to GitHub Packages
+name: Build
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Publish
-        run: |
-          chmod +x gradlew
-          ./gradlew publishMavenJavaPublicationToGitHubPackagesRepository --no-daemon
-        env:
-          GITHUB_TOKEN: *** secrets.GITHUB_TOKEN }}
+      - run: chmod +x gradlew && ./gradlew build --no-daemon
