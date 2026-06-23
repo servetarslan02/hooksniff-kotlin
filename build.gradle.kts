@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
     `maven-publish`
+    signing
 }
 
 group = "com.hooksniff"
@@ -27,6 +28,14 @@ java {
 
 publishing {
     repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("OSSRH_USERNAME") ?: ""
+                password = System.getenv("OSSRH_PASSWORD") ?: ""
+            }
+        }
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/servetarslan02/hooksniff-kotlin")
@@ -66,5 +75,14 @@ publishing {
                 }
             }
         }
+    }
+}
+
+signing {
+    val gpgKey = System.getenv("GPG_SIGNING_KEY")
+    val gpgPassword = System.getenv("GPG_SIGNING_PASSWORD")
+    if (!gpgKey.isNullOrEmpty()) {
+        useInMemoryPgpKeys(gpgKey, gpgPassword)
+        sign(publishing.publications["mavenJava"])
     }
 }
