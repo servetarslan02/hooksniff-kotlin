@@ -2,7 +2,6 @@ plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
     `maven-publish`
-    signing
 }
 
 group = "com.hooksniff"
@@ -29,13 +28,11 @@ java {
 publishing {
     repositories {
         maven {
-            name = "OSSRH"
-            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (version.toString().endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/servetarslan02/hooksniff-kotlin")
             credentials {
-                username = System.getenv("OSSRH_USERNAME") ?: findProperty("ossrhUsername") as? String ?: ""
-                password = System.getenv("OSSRH_PASSWORD") ?: findProperty("ossrhPassword") as? String ?: ""
+                username = System.getenv("GITHUB_ACTOR") ?: "servetarslan02"
+                password = System.getenv("GITHUB_TOKEN") ?: ""
             }
         }
     }
@@ -47,7 +44,7 @@ publishing {
             version = project.version.toString()
             pom {
                 name.set("HookSniff Kotlin SDK")
-                description.set("Official Kotlin SDK for HookSniff — the webhook infrastructure for developers")
+                description.set("Official Kotlin SDK for HookSniff webhook platform")
                 url.set("https://github.com/servetarslan02/hooksniff-kotlin")
                 licenses {
                     license {
@@ -69,15 +66,5 @@ publishing {
                 }
             }
         }
-    }
-}
-
-signing {
-    // ORG_GRADLE_PROJECT_signingKey → findProperty("signingKey")
-    val signingKey = findProperty("signingKey") as? String
-    val signingPassword = findProperty("signingPassword") as? String ?: ""
-    if (!signingKey.isNullOrBlank()) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
-        sign(publishing.publications["mavenJava"])
     }
 }
